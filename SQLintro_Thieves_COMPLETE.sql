@@ -1,6 +1,6 @@
 -- Verify connection to DB using the Actor Table
 SELECT *
-FROM inventory;
+FROM amount;
 
 -- Query for first_name and last_name from the actor table
 SELECT first_name, last_name
@@ -178,11 +178,12 @@ ORDER BY COUNT(amount) DESC;
 -- there are in 4.99 :3420 payments,5.99 :1187 payments, 3.99 :988 payments, 5.98 :7 payments
 -- 3. What film does the store have the most of? (search in inventory)
 
-SELECT film_id, store_id,address_id
-FROM  store
-GROUP BY store_id
-ORDER BY store_id DESC;
+SELECT film_id, COUNT(film_id) as film_count
+FROM  inventory
+GROUP BY film_id
+ORDER BY film_count DESC LIMIT 1;
 
+-- 3 film_id 350
 -- 4. How many customers have the last name ‘William’?
 SELECT first_name,last_name 
 FROM customer
@@ -194,12 +195,12 @@ WHERE last_name like 'William';
 -- 5. What store employee (get the id) sold the most rentals?
 
 
-SELECT staff_id, MAX(rental_id)
+SELECT staff_id, COUN(rental_id) as most_rental
 FROM rental
 GROUP BY staff_id
-ORDER BY  MAX(rental_id) DESC ;
+ORDER BY  most_rental  DESC LIMIT 1 ;
 
---5_A) staff_id 2  sold most rentals which is 16049 and staff_id 1 sold 16048 the differenc is just only one
+--5_A) staff_id 1  sold most rentals 
 
 -- 6. different district names are there?
 
@@ -207,8 +208,10 @@ SELECT rental_id,first_name, last_name
 FROM rental,staff
 
 
--- 6_A) yes mike hillyer and jon stephens but am not sure
-
+-- 6_A) How many different district names are there?
+  SELECT COUNT(DISTINCT district) 
+  FROM address;
+-- 6A   378 different districts
 -- 7. What film has the most actors in it? (use film_actor table and get film_id)
 
 SELECT film_id, max(actor_id)
@@ -228,11 +231,12 @@ WHERE store_id =1 AND last_name like '%es';
 -- with ids between 380 and 430? (use group by and having > 250)
 
 
-SELECT amount, COUNT(rental_id) AS rental_id
+SELECT amount, COUNT(*) AS rental_count
 FROM payment 
-WHERE customer_id BETWEEN 380 AND 430 AND amount >= 4.99
+JOIN rental ON payment.rental_id = rental.rental_id
+WHERE rental.customer_id BETWEEN 380 AND 430 
 GROUP BY amount
-HAVING COUNT(rental_id) > 250;
+HAVING COUNT(*) > 250;
 
 -- 9_A) there is only one 4.99 amout having 281
 
